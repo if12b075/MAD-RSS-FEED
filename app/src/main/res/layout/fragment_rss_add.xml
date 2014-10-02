@@ -11,9 +11,10 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:padding="5dp"
-            android:textSize="20dp"
+            android:textSize="20sp"
+            android:gravity="center"
             android:textAllCaps="true"
             android:text="@string/add_rss_feed" />
 

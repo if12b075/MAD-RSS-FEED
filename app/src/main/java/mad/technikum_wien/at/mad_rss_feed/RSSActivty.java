@@ -14,7 +14,6 @@ public class RSSActivty extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rssactivty);
         ActionBar b = getActionBar();
-        b.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         b.setDisplayShowTitleEnabled(false);
     }
