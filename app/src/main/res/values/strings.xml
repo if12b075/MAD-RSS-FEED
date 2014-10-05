@@ -10,5 +10,6 @@
     <string name="add">Add</string>
     <string name="subscribed_rss_feeds">Subscribed RSS Feeds</string>
     <string name="rss_feed">RSS Feed</string>
+    <string name="feedoverlist_list_tag">feedoverlist_list</string>
 
 </resources>

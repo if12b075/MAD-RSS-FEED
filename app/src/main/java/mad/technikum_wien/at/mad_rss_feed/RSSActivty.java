@@ -2,12 +2,13 @@ package mad.technikum_wien.at.mad_rss_feed;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class RSSActivty extends Activity {
+public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +17,7 @@ public class RSSActivty extends Activity {
         ActionBar b = getActionBar();
 
         b.setDisplayShowTitleEnabled(false);
+
     }
 
 
@@ -37,11 +39,18 @@ public class RSSActivty extends Activity {
                 return true;
             case R.id.add_feed:
                 getFragmentManager().beginTransaction().replace(R.id.main_frame,new RssAddFragment()).commit();
+
+
                 break;
             case R.id.show_feeds:
                 getFragmentManager().beginTransaction().replace(R.id.main_frame,new FeedOverviewListFragment()).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onAddRss(String feed) {
+       // FeedOverviewListFragment f = (FeedOverviewListFragment) getFragmentManager().beginTransaction().;
+       // f.addFeed(feed);
     }
 }

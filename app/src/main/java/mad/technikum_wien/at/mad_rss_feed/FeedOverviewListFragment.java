@@ -1,17 +1,18 @@
 package mad.technikum_wien.at.mad_rss_feed;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.widget.ListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+
+import java.util.ArrayList;
 
 import mad.technikum_wien.at.mad_rss_feed.dummy.DummyContent;
 
@@ -24,36 +25,27 @@ import mad.technikum_wien.at.mad_rss_feed.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class FeedOverviewListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class FeedOverviewListFragment extends Fragment implements ListView.OnItemClickListener {
 
-    private OnFragmentInteractionListener mListener;
+    private OnFeedOverviewFragmentInteraction mListener;
 
-    /**
-     * The fragment's ListView/GridView.
-     */
-    private AbsListView mListView;
+    private ListView mListView;
 
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
     private ListAdapter mAdapter;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+    private ArrayList<String> values = new ArrayList<String>();
+
     public FeedOverviewListFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        values.add("test1");
+        values.add("test2");
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        mAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);
     }
 
     @Override
@@ -62,7 +54,7 @@ public class FeedOverviewListFragment extends Fragment implements AbsListView.On
         View view = inflater.inflate(R.layout.fragment_feedoverviewlist, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
@@ -81,30 +73,23 @@ public class FeedOverviewListFragment extends Fragment implements AbsListView.On
         }
     }
 
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
     public void setEmptyText(CharSequence emptyText) {
         View emptyView = mListView.getEmptyView();
-
+        emptyText = "Sorry there are no feeds you have added";
         if (emptyText instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
     }
 
-    /**
-    * This interface must be implemented by activities that contain this
-    * fragment to allow an interaction in this fragment to be communicated
-    * to the activity and potentially other fragments contained in that
-    * activity.
-    * <p>
-    * See the Android Training lesson <a href=
-    * "http://developer.android.com/training/basics/fragments/communicating.html"
-    * >Communicating with Other Fragments</a> for more information.
-    */
-    public interface OnFragmentInteractionListener {
+    public void addFeed(String Feed) {
+        values.add(Feed);
+        mAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+
+    }
+
+    public interface OnFeedOverviewFragmentInteraction {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }

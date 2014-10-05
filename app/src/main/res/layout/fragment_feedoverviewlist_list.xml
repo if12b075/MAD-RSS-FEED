@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:tag="@string/feedoverlist_list_tag"
+    android:id="@+id/feedoverviewlist_list_id"
     tools:context="mad.technikum_wien.at.mad_rss_feed.FeedOverviewListFragment">
 
     <LinearLayout
