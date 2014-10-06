@@ -41,8 +41,17 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        values.add("test1");
-        values.add("test2");
+        Bundle bundle = this.getArguments();
+        if(!bundle.isEmpty()) {
+            ArrayList<String> temp = bundle.getStringArrayList("feeds");
+            if(!temp.isEmpty()) {
+                values.addAll(temp);
+            } else {
+                values.add("test1");
+                values.add("test2");
+            }
+        }
+
         // TODO: Change Adapter to display your content
         mAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, values);

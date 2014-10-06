@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
+import android.widget.Toast;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mad.technikum_wien.at.mad_rss_feed.broadcastreceiver.AddRssReceiver;
 
@@ -24,6 +28,7 @@ import mad.technikum_wien.at.mad_rss_feed.broadcastreceiver.AddRssReceiver;
  *
  */
 public class RssAddFragment extends Fragment {
+    private static String pattern = "^[a-zA-Z0-9\\-\\.]+\\.(com|org|net|mil|edu|COM|ORG|NET|MIL|EDU)$";
 
     private OnAddRssFragmentListener listener;
 
@@ -66,7 +71,13 @@ public class RssAddFragment extends Fragment {
         final Button addRssButton = (Button) v.findViewById(R.id.rssAddButton);
         addRssButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                listener.onAddRss (et.getText().toString());
+                if(IsMatch(et.getText().toString())) {
+                    listener.onAddRss (et.getText().toString());
+                    Toast.makeText(v.getContext(),"RSS Feed added", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(v.getContext(),"Please insert a valid Link", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
         return v;
@@ -74,6 +85,16 @@ public class RssAddFragment extends Fragment {
 
     public interface OnAddRssFragmentListener {
         public void onAddRss(String feed);
+    }
+
+    private static boolean IsMatch(String s) {
+        try {
+            Pattern patt = Pattern.compile(pattern);
+            Matcher matcher = patt.matcher(s);
+            return matcher.matches();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
 }

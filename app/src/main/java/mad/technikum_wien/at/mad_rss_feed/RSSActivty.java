@@ -5,19 +5,23 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
+import java.util.ArrayList;
 import android.view.MenuItem;
 
 
 public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragmentListener {
+    private ArrayList<String> feeds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rssactivty);
         ActionBar b = getActionBar();
 
         b.setDisplayShowTitleEnabled(false);
 
+        feeds = new ArrayList<String>();
     }
 
 
@@ -30,9 +34,6 @@ public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch(id) {
             case R.id.action_settings:
@@ -43,14 +44,17 @@ public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragm
 
                 break;
             case R.id.show_feeds:
-                getFragmentManager().beginTransaction().replace(R.id.main_frame,new FeedOverviewListFragment()).commit();
+                FeedOverviewListFragment feedOverviewListFragment = new FeedOverviewListFragment();
+                Bundle b = new Bundle();
+                b.putStringArrayList("feeds",feeds);
+                feedOverviewListFragment.setArguments(b);
+                getFragmentManager().beginTransaction().replace(R.id.main_frame,feedOverviewListFragment).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void onAddRss(String feed) {
-       // FeedOverviewListFragment f = (FeedOverviewListFragment) getFragmentManager().beginTransaction().;
-       // f.addFeed(feed);
+        feeds.add(feed);
     }
 }

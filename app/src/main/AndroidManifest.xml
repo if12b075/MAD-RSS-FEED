@@ -32,6 +32,11 @@
             android:name=".services.AddRssIntentService"
             android:exported="false" >
         </service>
+        <service
+            android:name=".GetRssFeedsService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
