@@ -1,16 +1,15 @@
 package mad.technikum_wien.at.mad_rss_feed;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-
 
 import java.util.ArrayList;
 
@@ -46,9 +45,9 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
             ArrayList<String> temp = bundle.getStringArrayList("feeds");
             if(!temp.isEmpty()) {
                 values.addAll(temp);
-            } else {
-                values.add("test1");
-                values.add("test2");
+//            } else {
+//                values.add("test1");
+//                values.add("test2");
             }
         }
 
@@ -66,6 +65,7 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         mListView = (ListView) view.findViewById(android.R.id.list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
+        mListView.setEmptyView(view.findViewById(android.R.id.empty));
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
@@ -78,13 +78,13 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mListener.onFeedSelection(DummyContent.ITEMS.get(position).id);
         }
     }
 
     public void setEmptyText(CharSequence emptyText) {
         View emptyView = mListView.getEmptyView();
-        emptyText = "Sorry there are no feeds you have added";
+//        emptyText = "Sorry there are no feeds you have added";
         if (emptyText instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
@@ -100,7 +100,7 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
 
     public interface OnFeedOverviewFragmentInteraction {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        public void onFeedSelection(String id);
     }
 
 }

@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":app" />
+        <option name="GRADLE_PROJECT_PATH" value=":android-http" />
       </configuration>
     </facet>
     <facet type="android" name="Android">
@@ -17,8 +17,8 @@
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
         <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
+        <option name="LIBRARY_PROJECT" value="true" />
       </configuration>
     </facet>
   </component>
@@ -77,9 +77,17 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="httpmime-4.3.3" level="project" />
+    <orderEntry type="library" exported="" name="ksoap2-android-assembly-2.6.1-jar-with-dependencies" level="project" />
+    <orderEntry type="library" exported="" name="httpcore-4.3.2" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="simple-xml-2.7.1" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-android-1.6.1-RC1" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.3" level="project" />
   </component>
 </module>
 

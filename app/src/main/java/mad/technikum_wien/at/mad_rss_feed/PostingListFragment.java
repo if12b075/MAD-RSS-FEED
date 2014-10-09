@@ -1,8 +1,8 @@
 package mad.technikum_wien.at.mad_rss_feed;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-
 
 import mad.technikum_wien.at.mad_rss_feed.dummy.DummyContent;
 
@@ -94,7 +93,7 @@ public class PostingListFragment extends Fragment implements AbsListView.OnItemC
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mListener.onPostingSelection(DummyContent.ITEMS.get(position).id);
         }
     }
 
@@ -123,7 +122,7 @@ public class PostingListFragment extends Fragment implements AbsListView.OnItemC
     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        public void onPostingSelection(String id);
     }
 
 }

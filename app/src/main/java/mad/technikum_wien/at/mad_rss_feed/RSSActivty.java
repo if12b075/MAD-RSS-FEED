@@ -2,14 +2,14 @@ package mad.technikum_wien.at.mad_rss_feed;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
-import java.util.ArrayList;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 
-public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragmentListener {
+
+public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragmentListener, FeedOverviewListFragment.OnFeedOverviewFragmentInteraction {
     private ArrayList<String> feeds;
 
     @Override
@@ -19,7 +19,9 @@ public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragm
         setContentView(R.layout.activity_rssactivty);
         ActionBar b = getActionBar();
 
-        b.setDisplayShowTitleEnabled(false);
+        if (b != null) {
+            b.setDisplayShowTitleEnabled(false);
+        }
 
         feeds = new ArrayList<String>();
     }
@@ -56,5 +58,16 @@ public class RSSActivty extends Activity implements RssAddFragment.OnAddRssFragm
 
     public void onAddRss(String feed) {
         feeds.add(feed);
+    }
+
+    @Override
+    public void onFeedSelection(String id) {
+        PostingListFragment postingsFragment = new PostingListFragment();
+        Bundle b = new Bundle();
+        b.putString("feedId", id);
+        postingsFragment.setArguments(b);
+
+        getFragmentManager().beginTransaction().replace(R.id.main_frame, postingsFragment).addToBackStack("postings").commit();
+
     }
 }
