@@ -1,5 +1,6 @@
 package mad.technikum_wien.at.mad_rss_feed;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,15 +14,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mad.technikum_wien.at.mad_rss_feed.dummy.DummyContent;
-
 /**
  * A fragment representing a list of Items.
  * <p />
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
  * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
+ * Activities containing this fragment MUST implement the {@link OnFeedOverviewFragmentInteraction}
  * interface.
  */
 public class FeedOverviewListFragment extends Fragment implements ListView.OnItemClickListener {
@@ -40,14 +39,13 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         Bundle bundle = this.getArguments();
-        if(!bundle.isEmpty()) {
+        if (bundle != null && !bundle.isEmpty()) {
             ArrayList<String> temp = bundle.getStringArrayList("feeds");
             if(!temp.isEmpty()) {
                 values.addAll(temp);
-//            } else {
-//                values.add("test1");
-//                values.add("test2");
             }
         }
 
@@ -63,7 +61,7 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
 
         // Set the adapter
         mListView = (ListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         mListView.setEmptyView(view.findViewById(android.R.id.empty));
         // Set OnItemClickListener so we can be notified on item clicks
@@ -72,19 +70,35 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         return view;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFeedOverviewFragmentInteraction) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFeedSelection(DummyContent.ITEMS.get(position).id);
+            System.out.println(values.get(position));
+            mListener.onFeedSelection(values.get(position));
         }
     }
 
     public void setEmptyText(CharSequence emptyText) {
         View emptyView = mListView.getEmptyView();
-//        emptyText = "Sorry there are no feeds you have added";
         if (emptyText instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
@@ -94,12 +108,11 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         values.add(Feed);
         mAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, values);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
     }
 
     public interface OnFeedOverviewFragmentInteraction {
-        // TODO: Update argument type and name
         public void onFeedSelection(String id);
     }
 

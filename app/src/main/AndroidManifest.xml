@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mad.technikum_wien.at.mad_rss_feed" >
+    package="mad.technikum_wien.at.mad_rss_feed">
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -8,11 +8,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".RSSActivty"
-            android:label="@string/app_name" >
-            <intent-filter>
+            android:name=".RSSActivity"
+            android:label="@string/app_name">
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,21 +22,16 @@
         <receiver
             android:name=".broadcastreceiver.AddRssReceiver"
             android:enabled="true"
-            android:exported="false" >
-            <intent-filter>
+            android:exported="false">
+        <intent-filter>
                 <action android:name="mad.technikum_wien.at.mad_rss_feed.broadcastreceiver.AddRssReceiver.ACTION_ADDRSS" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".services.AddRssIntentService"
-            android:exported="false" >
-        </service>
-        <service
             android:name=".GetRssFeedsService"
             android:enabled="true"
-            android:exported="false" >
-        </service>
+            android:exported="false" />
     </application>
 
 </manifest>

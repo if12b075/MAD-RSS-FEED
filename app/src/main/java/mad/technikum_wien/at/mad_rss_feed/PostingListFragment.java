@@ -16,11 +16,11 @@ import mad.technikum_wien.at.mad_rss_feed.dummy.DummyContent;
 
 /**
  * A fragment representing a list of Items.
- * <p />
+ * <p/>
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
- * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
+ * <p/>
+ * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
 public class PostingListFragment extends Fragment implements AbsListView.OnItemClickListener {
@@ -62,10 +62,21 @@ public class PostingListFragment extends Fragment implements AbsListView.OnItemC
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
+
+        Bundle bundle = this.getArguments();
+        if (!bundle.isEmpty()) {
+            String temp = bundle.getString("feedTitle");
+            if (!temp.isEmpty()) {
+                TextView title = (TextView) view.findViewById(R.id.postingListTitle);
+                title.setText(temp);
+
+            }
+        }
+
 
         return view;
     }
@@ -77,7 +88,7 @@ public class PostingListFragment extends Fragment implements AbsListView.OnItemC
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -111,15 +122,15 @@ public class PostingListFragment extends Fragment implements AbsListView.OnItemC
     }
 
     /**
-    * This interface must be implemented by activities that contain this
-    * fragment to allow an interaction in this fragment to be communicated
-    * to the activity and potentially other fragments contained in that
-    * activity.
-    * <p>
-    * See the Android Training lesson <a href=
-    * "http://developer.android.com/training/basics/fragments/communicating.html"
-    * >Communicating with Other Fragments</a> for more information.
-    */
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onPostingSelection(String id);

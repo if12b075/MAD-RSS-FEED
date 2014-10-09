@@ -1,51 +1,38 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="mad.technikum_wien.at.mad_rss_feed.RssAddFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/add_rss_feed"
+        android:textAllCaps="true"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="50dp"
+        android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/rssLinkTextField"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:textAllCaps="true"
-            android:text="@string/add_rss_feed" />
+            android:layout_weight="3"
+            android:hint="@string/rss_feed_link"
+            android:inputType="textUri" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/rssLinkTextField"
-                android:layout_weight="3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="textUri"
-                android:hint="@string/rss_feed_link"
-                />
-            <Button
-                android:id="@+id/rssAddButton"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/add" />
-
-        </LinearLayout>
-
-
-
-
-
-
-
+        <Button
+            android:id="@+id/rssAddButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/add" />
 
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>
