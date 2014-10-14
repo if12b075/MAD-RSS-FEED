@@ -76,12 +76,12 @@ public class RssAddFragment extends Fragment {
         final Button addRssButton = (Button) v.findViewById(R.id.rssAddButton);
         addRssButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (IsMatch(et.getText().toString())) {
+//                if (IsMatch(et.getText().toString())) {
                     listener.onAddRss(et.getText().toString());
                     Toast.makeText(v.getContext(), "RSS Feed added", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(v.getContext(), "Please insert a valid Link", Toast.LENGTH_LONG).show();
-                }
+//                } else {
+//                    Toast.makeText(v.getContext(), "Please insert a valid Link", Toast.LENGTH_LONG).show();
+//                }
 
             }
         });

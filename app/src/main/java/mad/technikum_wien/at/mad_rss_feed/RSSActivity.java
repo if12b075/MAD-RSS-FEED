@@ -19,10 +19,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         setContentView(R.layout.activity_rssactivity);
 
         getFragmentManager().beginTransaction().replace(R.id.main_frame, new FeedOverviewListFragment()).commit();
-
         ActionBar b = getActionBar();
-
-
         if (b != null) {
             b.setDisplayShowTitleEnabled(false);
         }
