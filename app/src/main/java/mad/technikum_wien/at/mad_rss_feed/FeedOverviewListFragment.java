@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -31,7 +30,7 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
 
     private ListAdapter mAdapter;
 
-    private ArrayList<String> values = new ArrayList<String>();
+    private ArrayList<String> feedsTitleList = new ArrayList<String>();
 
     public FeedOverviewListFragment() {
     }
@@ -40,23 +39,12 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        Bundle bundle = this.getArguments();
-        if (bundle != null && !bundle.isEmpty()) {
-            ArrayList<String> temp = bundle.getStringArrayList("feeds");
-            if(!temp.isEmpty()) {
-                values.addAll(temp);
-            }
-        }
-
-        // TODO: Change Adapter to display your content
         mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                android.R.layout.simple_list_item_1, android.R.id.text1, feedsTitleList);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_feedoverviewlist, container, false);
 
         // Set the adapter
@@ -92,22 +80,18 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            System.out.println(values.get(position));
-            mListener.onFeedSelection(values.get(position));
+//            System.out.println(feedsTitleList.get(position));
+            mListener.onFeedSelection(feedsTitleList.get(position));
         }
     }
 
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-        if (emptyText instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
+    public void setFeeds(ArrayList<Feed> feedList) {
+        feedsTitleList.clear();
+        for (Feed feed : feedList) {
+            feedsTitleList.add(feed.getTitle());
         }
-    }
-
-    public void addFeed(String Feed) {
-        values.add(Feed);
         mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                android.R.layout.simple_list_item_1, android.R.id.text1, feedsTitleList);
         mListView.setAdapter(mAdapter);
 
     }

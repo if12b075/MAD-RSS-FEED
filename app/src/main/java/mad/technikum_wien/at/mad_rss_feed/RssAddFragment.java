@@ -8,11 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,7 +18,6 @@ import java.util.regex.Pattern;
  * create an instance of this fragment.
  */
 public class RssAddFragment extends Fragment {
-    private static String pattern = "^[a-zA-Z0-9\\-\\.]+\\.(com|org|net|mil|edu|COM|ORG|NET|MIL|EDU)$";
 
     private OnAddRssFragmentListener listener;
 
@@ -33,16 +27,6 @@ public class RssAddFragment extends Fragment {
 
     public static RssAddFragment newInstance() {
         return new RssAddFragment();
-    }
-
-    private static boolean IsMatch(String s) {
-        try {
-            Pattern patt = Pattern.compile(pattern);
-            Matcher matcher = patt.matcher(s);
-            return matcher.matches();
-        } catch (RuntimeException e) {
-            return false;
-        }
     }
 
     @Override
@@ -76,13 +60,7 @@ public class RssAddFragment extends Fragment {
         final Button addRssButton = (Button) v.findViewById(R.id.rssAddButton);
         addRssButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                if (IsMatch(et.getText().toString())) {
-                    listener.onAddRss(et.getText().toString());
-                    Toast.makeText(v.getContext(), "RSS Feed added", Toast.LENGTH_LONG).show();
-//                } else {
-//                    Toast.makeText(v.getContext(), "Please insert a valid Link", Toast.LENGTH_LONG).show();
-//                }
-
+                listener.onAddRss(et.getText().toString());
             }
         });
         return v;

@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package mad.technikum_wien.at.mad_rss_feed;
+package mad.technikum_wien.at.mad_rss_feed.processors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -25,32 +23,24 @@ import at.diamonddogs.service.processor.XMLProcessor;
 /**
  *
  */
-public class RssProcessor extends XMLProcessor<String[]> {
+public class RssTitleProcessor extends XMLProcessor<String> {
 
     public static final int ID = 93025;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RssProcessor.class.getSimpleName());
 
     /**
-     * Parses news post titles only
+     * Parses feed title only
      */
-    @Override
-    protected String[] parse(Document inputObject) {
+    protected String parse(Document inputObject) {
         NodeList nodeList = inputObject.getElementsByTagName("title");
-        String[] ret = new String[nodeList.getLength()];
+        String ret = "";
         for (int i = 0; i < nodeList.getLength(); i++) {
-            if (nodeList.item(i).getParentNode().getNodeName().equals("item")) {
-                ret[i] = nodeList.item(i).getTextContent();
-            } else {
-                ret[i] = "";
+            if (nodeList.item(i).getParentNode().getNodeName().equals("channel")) {
+                ret = nodeList.item(i).getTextContent();
             }
         }
-
-//		String[] ret = new String[nodeList.getLength()];
-//		for (int i = 0; i < nodeList.getLength(); i++) {
-//			ret[i] = nodeList.item(i).getTextContent();
-//		}
         return ret;
     }
+
 
     /**
      * {@inheritDoc}
