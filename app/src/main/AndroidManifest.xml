@@ -32,6 +32,14 @@
             android:name=".GetRssFeedsService"
             android:enabled="true"
             android:exported="false" />
+
+        <provider
+            android:name="mad.technikum_wien.at.mad_rss_feed.FeedContentProvider"
+            android:authorities="mad.technikum_wien.at.mad_rss_feed.provider" />
+        <provider
+            android:name="mad.technikum_wien.at.mad_rss_feed.FeedItemContentProvider"
+            android:authorities="mad.technikum_wien.at.mad_rss_feed.provider" />
+
     </application>
 
 </manifest>

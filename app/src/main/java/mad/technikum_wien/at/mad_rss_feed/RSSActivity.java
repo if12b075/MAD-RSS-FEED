@@ -2,6 +2,7 @@ package mad.technikum_wien.at.mad_rss_feed;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,25 +11,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.StringTokenizer;
 
 import at.diamonddogs.data.dataobjects.WebRequest;
 import at.diamonddogs.service.net.HttpServiceAssister;
 import at.diamonddogs.service.processor.ServiceProcessor;
+import mad.technikum_wien.at.mad_rss_feed.processors.RssDateProcessor;
 import mad.technikum_wien.at.mad_rss_feed.processors.RssProcessor;
 import mad.technikum_wien.at.mad_rss_feed.processors.RssTitleProcessor;
 
+public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFragmentListener,
+        FeedOverviewListFragment.OnFeedOverviewFragmentInteraction {
 
-public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFragmentListener, FeedOverviewListFragment.OnFeedOverviewFragmentInteraction {
+    public DaoSession daoSession;
+    //    FeedContentProvider feedCP;
+//    FeedItemContentProvider feedItemCP;
+    FeedDao feedDao;
+    FeedItemDao feedItemDao;
     private ArrayList<String> feedUrls = new ArrayList<String>();
     private ArrayList<Feed> feedList = new ArrayList<Feed>();
     private Feed lastFeed;
     private FeedOverviewListFragment feedsFragment = new FeedOverviewListFragment();
     private PostingListFragment postingsFragment = new PostingListFragment();
-
     private HttpServiceAssister assister;
     private Uri RSS;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +52,32 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         }
 
         assister = new HttpServiceAssister(this);
+
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "mad-rss-feed-db", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+        feedDao = daoSession.getFeedDao();
+        feedItemDao = daoSession.getFeedItemDao();
+//        feedCP = new FeedContentProvider();
+//        feedItemCP = new FeedItemContentProvider();
+
+//        feedItemDao.deleteAll();
+//        feedDao.deleteAll();
+
+        feedList.addAll(feedDao.loadAll());
+
+        if (feedList.isEmpty()) {
+            feedDao.insertOrReplace(new Feed(null, "rss.orf.at/science.xml", "science.ORF.at"));
+            feedDao.insertOrReplace(new Feed(null, "http://derStandard.at/?page=rss&ressort=Seite1", "derStandard.at"));
+            feedList.addAll(feedDao.loadAll());
+        }
+
+    }
+
+    public DaoSession getDaoSession() {
+        return daoSession;
     }
 
     @Override
@@ -76,6 +112,8 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
     protected void onResume() {
         super.onResume();
         assister.bindService();
+        feedsFragment.setFeeds(feedList);
+
     }
 
     @Override
@@ -91,6 +129,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                 lastFeed = feed;
                 assister.runWebRequest(new RssHandler(), createGetRssRequest(lastFeed.getUrl(),
                         RssProcessor.ID), new RssProcessor());
+                break;
             }
         }
         getFragmentManager().beginTransaction().replace(R.id.main_frame, postingsFragment).
@@ -110,6 +149,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
             if (feed.getTitle().equals(title)) {
                 feedUrls.remove(feed.getUrl());
                 feedList.remove(feed);
+                feedDao.delete(feed);
             }
         }
 
@@ -124,7 +164,9 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         }
         if (!feedUrls.contains(url)) {
             feedUrls.add(url);
-            lastFeed = new Feed(feedUrls.size(), url);
+            lastFeed = new Feed();
+            lastFeed.setUrl(url);
+            feedDao.insertOrReplace(lastFeed);
             assister.runWebRequest(new RssTitleHandler(), createGetRssRequest(url, RssTitleProcessor.ID),
                     new RssTitleProcessor());
         } else {
@@ -187,6 +229,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                     title = (String) msg.obj;
                     lastFeed.setTitle(title);
                     feedList.add(lastFeed);
+                    feedDao.insertOrReplace(lastFeed);
                     feedsFragment.setFeeds(feedList);
                     Toast.makeText(RSSActivity.this, "feed added", Toast.LENGTH_SHORT).show();
                 } else {
@@ -210,8 +253,12 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
             if (msg.what == RssProcessor.ID) {
                 if (msg.arg1 == ServiceProcessor.RETURN_MESSAGE_OK) {
 //                    System.err.println("msg.obj.class: " + msg.obj.getClass().getSimpleName());
-                    lastFeed.setPosts((ArrayList<String>) msg.obj);
-                    postingsFragment.setPostings((ArrayList<String>) msg.obj);
+                    System.out.println("lastFeed.getId: " + lastFeed.getId());
+                    for (String title : (ArrayList<String>) msg.obj) {
+                        feedItemDao.insertOrReplace(new FeedItem(null, title, lastFeed.getId()));
+                    }
+//                    lastFeed.setPosts((ArrayList<String>) msg.obj);
+                    postingsFragment.setPostings(feedItemDao._queryFeed_Items(lastFeed.getId()));
                     postingsFragment.setTitle(lastFeed.getTitle());
                     Toast.makeText(RSSActivity.this,
                             "From cache -> " + msg.getData().getSerializable(ServiceProcessor.BUNDLE_EXTRA_MESSAGE_FROMCACHE),
@@ -223,5 +270,41 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         }
     }
 
+    /**
+     * Handler für Abfrage von feedDate
+     */
+    protected final class RssDateHandler extends Handler {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == RssDateProcessor.ID) {
+                if (msg.arg1 == ServiceProcessor.RETURN_MESSAGE_OK) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    StringTokenizer st = new StringTokenizer((String) msg.obj, "+");
+                    String d = st.nextToken();
+                    String tz = st.nextToken();
+                    try {
+                        Date date = sdf.parse(d);
+                        sdf = new SimpleDateFormat("HH:mm");
+                        Date tZone = sdf.parse(tz);
+                        date.setTime(date.getTime() + tZone.getTime());
+                        System.out.println(date);
+                        //                    lastFeed.setTitle(title);
+                        //                    feedList.add(lastFeed);
+                        //                    feedDao.attachEntity(lastFeed);
+                        //                    feedsFragment.setFeeds(feedList);
+                        Toast.makeText(RSSActivity.this, "date parsed", Toast.LENGTH_SHORT).show();
+                    } catch (ParseException e) {
+                        Toast.makeText(RSSActivity.this, "problem with date", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(RSSActivity.this, "not a valid RSS", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
 
 }

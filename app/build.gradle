@@ -1,8 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+
     compileSdkVersion 19
     buildToolsVersion "20.0.0"
+    sourceSets {
+        main {
+            java {
+                srcDir 'src-gen'
+            }
+        }
+    }
     defaultConfig {
         applicationId "mad.technikum_wien.at.mad_rss_feed"
         minSdkVersion 16
@@ -22,11 +30,13 @@ android {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
     }
 
 }
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':android-http')
+    compile('de.greenrobot:greendao-generator:1.3.1', 'de.greenrobot:greendao:1.3.1')
+
 }

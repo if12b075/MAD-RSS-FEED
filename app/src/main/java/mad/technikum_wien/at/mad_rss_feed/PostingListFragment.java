@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -67,8 +68,11 @@ public class PostingListFragment extends Fragment {
         return view;
     }
 
-    public void setPostings(ArrayList<String> posts) {
-        postings = posts;
+    public void setPostings(List<FeedItem> posts) {
+        postings.clear();
+        for (FeedItem fi : posts) {
+            postings.add(fi.getTitle());
+        }
         mListView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
                 android.R.id.text1, postings));
     }
