@@ -14,5 +14,6 @@
     <string name="action_add">Add</string>
     <string name="action_show">Show</string>
     <string name="feedsListEmptyText">noch keine feeds hinzugefügt</string>
+    <string name="menu_delete_title">Delete</string>
 
 </resources>

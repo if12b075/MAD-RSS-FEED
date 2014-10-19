@@ -54,7 +54,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch(id) {
+        switch (id) {
             case R.id.action_settings:
                 return true;
             case R.id.add_feed:
@@ -97,6 +97,25 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                 addToBackStack(null).commit();
     }
 
+    /**
+     * Wird aufgerufen wenn Feeds gelöscht werden
+     *
+     * @param title Titel des zu löschenden Feeds
+     */
+    @Override
+    public void onFeedDeleted(String title) {
+        Feed feed;
+        for (int i = 0; i < feedList.size(); i++) {
+            feed = feedList.get(i);
+            if (feed.getTitle().equals(title)) {
+                feedUrls.remove(feed.getUrl());
+                feedList.remove(feed);
+            }
+        }
+
+    }
+
+    @Override
     public void onAddRss(String url) {
 //        System.out.println(feedUrls);
         if (url.isEmpty()) {
@@ -203,4 +222,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
             }
         }
     }
+
+
 }
