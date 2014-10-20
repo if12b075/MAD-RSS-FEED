@@ -45,6 +45,11 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rssactivity);
 
+        Bundle bundle = new Bundle();
+        feedsFragment.setArguments(bundle);
+        postingsFragment.setArguments(bundle);
+
+
         getFragmentManager().beginTransaction().replace(R.id.main_frame, feedsFragment).commit();
         ActionBar b = getActionBar();
         if (b != null) {
@@ -53,27 +58,26 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
 
         assister = new HttpServiceAssister(this);
 
-
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "mad-rss-feed-db", null);
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
+//        daoSession.clear();
         feedDao = daoSession.getFeedDao();
         feedItemDao = daoSession.getFeedItemDao();
 //        feedCP = new FeedContentProvider();
 //        feedItemCP = new FeedItemContentProvider();
 
-//        feedItemDao.deleteAll();
-//        feedDao.deleteAll();
 
         feedList.addAll(feedDao.loadAll());
 
         if (feedList.isEmpty()) {
-            feedDao.insertOrReplace(new Feed(null, "rss.orf.at/science.xml", "science.ORF.at"));
-            feedDao.insertOrReplace(new Feed(null, "http://derStandard.at/?page=rss&ressort=Seite1", "derStandard.at"));
+            System.out.println("RSSActivity.onCreate() feedList: " + feedList);
+            feedDao.insertOrReplace(new Feed(null, "rss.orf.at/science.xml", "science.ORF.at", new Date(System.currentTimeMillis()), false, false));
+            feedDao.insertOrReplace(new Feed(null, "http://derStandard.at/?page=rss&ressort=Seite1", "derStandard.at", new Date(System.currentTimeMillis()), false, false));
             feedList.addAll(feedDao.loadAll());
         }
-
+        System.out.println("feedList: " + feedList);
     }
 
     public DaoSession getDaoSession() {
@@ -113,7 +117,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         super.onResume();
         assister.bindService();
         feedsFragment.setFeeds(feedList);
-
     }
 
     @Override
@@ -124,11 +127,25 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
 
     @Override
     public void onFeedSelection(String feedTitle) {
+        updateData();
         for (Feed feed : feedList) {
             if (feed.getTitle().equals(feedTitle)) {
                 lastFeed = feed;
-                assister.runWebRequest(new RssHandler(), createGetRssRequest(lastFeed.getUrl(),
-                        RssProcessor.ID), new RssProcessor());
+                Bundle b = postingsFragment.getArguments();
+                b.putString("title", lastFeed.getTitle());
+
+                ArrayList<FeedItem> itemsList = new ArrayList<FeedItem>();
+                itemsList.addAll(feedItemDao._queryFeed_Items(lastFeed.getId()));
+                System.out.println("itemsList: " + itemsList);
+                if (itemsList.isEmpty()) {
+                    postingsFragment.setPostings(new ArrayList<FeedItem>());
+                    assister.runWebRequest(new RssHandler(), createGetRssRequest(lastFeed.getUrl(),
+                            RssProcessor.ID), new RssProcessor());
+                } else {
+                    Toast.makeText(RSSActivity.this, "from db", Toast.LENGTH_SHORT).show();
+                    postingsFragment.setPostings(itemsList);
+                }
+
                 break;
             }
         }
@@ -139,20 +156,20 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
     /**
      * Wird aufgerufen wenn Feeds gelöscht werden
      *
-     * @param title Titel des zu löschenden Feeds
+     * @param titles ArrayList mit Titel der zu löschenden Feeds
      */
     @Override
-    public void onFeedDeleted(String title) {
-        Feed feed;
-        for (int i = 0; i < feedList.size(); i++) {
-            feed = feedList.get(i);
-            if (feed.getTitle().equals(title)) {
-                feedUrls.remove(feed.getUrl());
-                feedList.remove(feed);
-                feedDao.delete(feed);
+    public void onFeedDeleted(ArrayList<String> titles) {
+        for (String title : titles) {
+            for (Feed f : feedList) {
+                if (f.getTitle().equals(title)) {
+                    feedItemDao.deleteInTx(feedItemDao._queryFeed_Items(f.getId()));
+                    feedDao.delete(f);
+                    break;
+                }
             }
         }
-
+        updateData();
     }
 
     @Override
@@ -163,16 +180,39 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
             return;
         }
         if (!feedUrls.contains(url)) {
-            feedUrls.add(url);
             lastFeed = new Feed();
             lastFeed.setUrl(url);
             feedDao.insertOrReplace(lastFeed);
+
+            updateData();
+
+            //webRequest zur abfrage des Titels
             assister.runWebRequest(new RssTitleHandler(), createGetRssRequest(url, RssTitleProcessor.ID),
                     new RssTitleProcessor());
+
+            assister.runWebRequest(new RssDateHandler(), createGetRssRequest(lastFeed.getUrl(),
+                    RssDateProcessor.ID), new RssDateProcessor());
+
+            assister.runWebRequest(new RssHandler(), createGetRssRequest(lastFeed.getUrl(),
+                    RssProcessor.ID), new RssProcessor());
+
         } else {
             Toast.makeText(RSSActivity.this, "Feed already exists", Toast.LENGTH_LONG).show();
         }
 //        System.out.println("onAddRss().feedUrls: "+feedUrls);
+    }
+
+    /**
+     * Update all feed data lists
+     */
+    private void updateData() {
+        feedList.clear();
+        feedList.addAll(feedDao.loadAll());
+        feedUrls.clear();
+        for (Feed f : feedList) {
+            feedUrls.add(f.getUrl());
+        }
+        feedsFragment.setFeeds(feedList);
     }
 
     /**
@@ -191,10 +231,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         wr.setUrl(RSS);
         wr.setProcessorId(processorId);
 
-        /**
-         * Cache nur für Posts
-         */
-        if (processorId == RssProcessor.ID) {
             // This is the important part, telling HttpService how long a WebRequest
             // will be saved. Since RssProcessor extends XMLProcessor, which extends
             // DataProcessor, the WebRequest's data will be cached automatically,
@@ -206,10 +242,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
             // set to true, cache data will not be removed if it has expired as long
             // as the device was offline during the request
             wr.setUseOfflineCache(true);
-        } else {
-            wr.setCacheTime(0);
-            wr.setUseOfflineCache(false);
-        }
         return wr;
     }
 
@@ -230,7 +262,7 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                     lastFeed.setTitle(title);
                     feedList.add(lastFeed);
                     feedDao.insertOrReplace(lastFeed);
-                    feedsFragment.setFeeds(feedList);
+                    updateData();
                     Toast.makeText(RSSActivity.this, "feed added", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(RSSActivity.this, "not a valid RSS", Toast.LENGTH_LONG).show();
@@ -255,11 +287,12 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
 //                    System.err.println("msg.obj.class: " + msg.obj.getClass().getSimpleName());
                     System.out.println("lastFeed.getId: " + lastFeed.getId());
                     for (String title : (ArrayList<String>) msg.obj) {
-                        feedItemDao.insertOrReplace(new FeedItem(null, title, lastFeed.getId()));
+                        FeedItem item = new FeedItem();
+                        item.setTitle(title);
+                        item.setFeedId(lastFeed.getId());
+                        feedItemDao.insertOrReplace(item);
                     }
-//                    lastFeed.setPosts((ArrayList<String>) msg.obj);
                     postingsFragment.setPostings(feedItemDao._queryFeed_Items(lastFeed.getId()));
-                    postingsFragment.setTitle(lastFeed.getTitle());
                     Toast.makeText(RSSActivity.this,
                             "From cache -> " + msg.getData().getSerializable(ServiceProcessor.BUNDLE_EXTRA_MESSAGE_FROMCACHE),
                             Toast.LENGTH_SHORT).show();
@@ -285,17 +318,13 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                     StringTokenizer st = new StringTokenizer((String) msg.obj, "+");
                     String d = st.nextToken();
-                    String tz = st.nextToken();
                     try {
                         Date date = sdf.parse(d);
-                        sdf = new SimpleDateFormat("HH:mm");
-                        Date tZone = sdf.parse(tz);
-                        date.setTime(date.getTime() + tZone.getTime());
+                        date.setTime(date.getTime());
                         System.out.println(date);
-                        //                    lastFeed.setTitle(title);
-                        //                    feedList.add(lastFeed);
-                        //                    feedDao.attachEntity(lastFeed);
-                        //                    feedsFragment.setFeeds(feedList);
+                        lastFeed.setLastUpdate(date);
+                        feedDao.insertOrReplace(lastFeed);
+                        updateData();
                         Toast.makeText(RSSActivity.this, "date parsed", Toast.LENGTH_SHORT).show();
                     } catch (ParseException e) {
                         Toast.makeText(RSSActivity.this, "problem with date", Toast.LENGTH_SHORT).show();

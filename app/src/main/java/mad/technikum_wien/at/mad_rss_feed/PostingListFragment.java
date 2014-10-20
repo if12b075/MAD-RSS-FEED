@@ -24,6 +24,7 @@ public class PostingListFragment extends Fragment {
 
     private TextView title;
 
+    private ArrayAdapter mAdapter;
 
     /**
      * The fragment's ListView/GridView.
@@ -49,8 +50,8 @@ public class PostingListFragment extends Fragment {
 
 
 //        // TODO: Change Adapter to display your content
-//        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-//                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        mAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, postings);
     }
 
     @Override
@@ -58,12 +59,13 @@ public class PostingListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_postinglist, container, false);
         title = (TextView) view.findViewById(R.id.postingListTitle);
-
+        title.setText(getArguments().getString("title"));
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
-                android.R.id.text1, postings));
+        mListView.setAdapter(mAdapter);
+        postings = getArguments().getStringArrayList("postings");
+        mAdapter.notifyDataSetChanged();
 
         return view;
     }
@@ -73,11 +75,17 @@ public class PostingListFragment extends Fragment {
         for (FeedItem fi : posts) {
             postings.add(fi.getTitle());
         }
-        mListView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
-                android.R.id.text1, postings));
+//        System.out.println("postings: "+postings);
+//        System.out.println("mListView: "+mListView);
+        getArguments().putStringArrayList("postings", postings);
+        if (mListView != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 
     public void setTitle(String rssTitle) {
-        title.setText(rssTitle);
+//            System.out.println("PostingListFragment: title: "+title);
+        getArguments().putString("title", rssTitle);
     }
 }

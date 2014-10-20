@@ -65,7 +65,6 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(this);
 
-
         return view;
     }
 
@@ -101,8 +100,10 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
         for (Feed feed : feedList) {
             feedsTitleList.add(feed.getTitle());
         }
-        mAdapter.notifyDataSetChanged();
+        if (mListView != null) {
+            mAdapter.notifyDataSetChanged();
 
+        }
     }
 
     /**
@@ -139,14 +140,14 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
                 Toast.makeText(getActivity(), "deleted", Toast.LENGTH_SHORT).show();
                 //markierte feeds werden gelöscht
                 SparseBooleanArray checkedItems = mListView.getCheckedItemPositions();
+                ArrayList<String> titles = new ArrayList<String>();
                 for (int i = 0; i < checkedItems.size(); i++) {
                     if (checkedItems.valueAt(i)) {
-                        String title = (String) mListView.getItemAtPosition(checkedItems.keyAt(i));
-                        feedsTitleList.remove(title);
-                        //callback in activity
-                        mListener.onFeedDeleted(title);
+                        titles.add((String) mListView.getItemAtPosition(checkedItems.keyAt(i)));
                     }
                 }
+                //callback in activity
+                mListener.onFeedDeleted(titles);
                 mAdapter.notifyDataSetChanged();
                 mode.finish();
         }
@@ -166,7 +167,7 @@ public class FeedOverviewListFragment extends Fragment implements ListView.OnIte
     public interface OnFeedOverviewFragmentInteraction {
         public void onFeedSelection(String id);
 
-        public void onFeedDeleted(String title);
+        public void onFeedDeleted(ArrayList<String> titles);
     }
 
 }

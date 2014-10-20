@@ -10,19 +10,27 @@ import de.greenrobot.daogenerator.ToMany;
 
 public class RssDaoGenerator {
     public static void main(String args[]) throws Exception {
-        Schema schema = new Schema(3, "mad.technikum_wien.at.mad_rss_feed");
+        //wenn die struktur der db geändert wird muss die versionsnummer erhöht werden (1. parameter)
+        Schema schema = new Schema(4, "mad.technikum_wien.at.mad_rss_feed");
 
         Entity feedItem = schema.addEntity("FeedItem");
+        feedItem.setSuperclass("android.database.ContentObservable");
         feedItem.addIdProperty().autoincrement();
         feedItem.addStringProperty("title");
-        feedItem.addContentProvider();
+        feedItem.addBooleanProperty("read");
+        feedItem.addBooleanProperty("starred");
+        feedItem.addContentProvider().setClassName("FeedItemContentProvider");
 
         Entity feed = schema.addEntity("Feed");
+        feed.setSuperclass("android.database.ContentObservable");
         feed.setTableName("FEEDS");
         feed.addIdProperty();
         feed.addStringProperty("url");
         feed.addStringProperty("title");
-        feed.addContentProvider();
+        feed.addDateProperty("lastUpdate");
+        feed.addBooleanProperty("read");
+        feed.addBooleanProperty("starred");
+        feed.addContentProvider().setClassName("FeedContentProvider");
 
         Property feedId = feedItem.addLongProperty("feedId").notNull().getProperty();
         feedItem.addToOne(feed, feedId);
