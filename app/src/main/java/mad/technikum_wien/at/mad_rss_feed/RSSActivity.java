@@ -68,7 +68,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
 //        feedCP = new FeedContentProvider();
 //        feedItemCP = new FeedItemContentProvider();
 
-
         feedList.addAll(feedDao.loadAll());
 
         if (feedList.isEmpty()) {
@@ -133,7 +132,6 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
                 lastFeed = feed;
                 Bundle b = postingsFragment.getArguments();
                 b.putString("title", lastFeed.getTitle());
-
                 ArrayList<FeedItem> itemsList = new ArrayList<FeedItem>();
                 itemsList.addAll(feedItemDao._queryFeed_Items(lastFeed.getId()));
                 System.out.println("itemsList: " + itemsList);
@@ -231,17 +229,17 @@ public class RSSActivity extends Activity implements RssAddFragment.OnAddRssFrag
         wr.setUrl(RSS);
         wr.setProcessorId(processorId);
 
-            // This is the important part, telling HttpService how long a WebRequest
-            // will be saved. Since RssProcessor extends XMLProcessor, which extends
-            // DataProcessor, the WebRequest's data will be cached automatically,
-            // provided that cacheTime is not CACHE_NO.
-            wr.setCacheTime(50000);
+        // This is the important part, telling HttpService how long a WebRequest
+        // will be saved. Since RssProcessor extends XMLProcessor, which extends
+        // DataProcessor, the WebRequest's data will be cached automatically,
+        // provided that cacheTime is not CACHE_NO.
+        wr.setCacheTime(50000);
 
-            // Enables offline caching. usually, cache data is deleted on retrieval
-            // if it has expired even if the device is not online. If this flag is
-            // set to true, cache data will not be removed if it has expired as long
-            // as the device was offline during the request
-            wr.setUseOfflineCache(true);
+        // Enables offline caching. usually, cache data is deleted on retrieval
+        // if it has expired even if the device is not online. If this flag is
+        // set to true, cache data will not be removed if it has expired as long
+        // as the device was offline during the request
+        wr.setUseOfflineCache(true);
         return wr;
     }
 
